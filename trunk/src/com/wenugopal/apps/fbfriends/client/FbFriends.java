@@ -97,7 +97,7 @@ public class FbFriends implements EntryPoint {
 		fbEvent.subscribe("auth.login", new AsyncCallback<JavaScriptObject>() {
 
 			public void onSuccess(JavaScriptObject result) {
-				Window.alert("auth.login is invoked");
+//				Window.alert("auth.login is invoked");
 			}
 
 			public void onFailure(Throwable caught) {

@@ -19,6 +19,8 @@ public class SVGMapPanel extends Composite {
 	public static int HEIGHT = 1800;
 
 	public static int LEFT = 450;
+	
+	public static float CIRCLE_RADIUS = 16f; 
 
 	public static String IMAGE_URL = "800px-Equirectangular-projection.jpg";
 
@@ -64,7 +66,7 @@ public class SVGMapPanel extends Composite {
 		lat2 = MapUtil.getTop(SVGMapPanel.HEIGHT, lat2);
 
 		// Create a circle
-		final OMSVGCircleElement circle2 = doc.createSVGCircleElement((float)lng2, (float)lat2, 8f);
+		final OMSVGCircleElement circle2 = doc.createSVGCircleElement((float)lng2, (float)lat2, CIRCLE_RADIUS);
 		//        circle.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);
 		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
 		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.4");
@@ -92,12 +94,13 @@ public class SVGMapPanel extends Composite {
 
 
 		//		pathElement.getStyle().setSVGProperty(SVGConstants.CSS_STROKE_VALUE, "#3B5998");
+		final OMSVGCircleElement circle2 = doc.createSVGCircleElement((float)lng2, (float)lat2, CIRCLE_RADIUS);
 		String color = "red";
 		if(me) {
 			color = "green";
+			
 		}
 		// Create a circle
-		final OMSVGCircleElement circle2 = doc.createSVGCircleElement((float)lng2, (float)lat2, 8f);
 		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
 		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.4");
 		mapSvg.appendChild(circle2);
