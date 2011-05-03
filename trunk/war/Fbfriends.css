@@ -1,0 +1,243 @@
+h1 {
+	font-size: 2em;
+	font-weight: bold;
+	color: #777777;
+	margin: 40px 0px 70px;
+	text-align: center;
+}
+
+.infoDiv {
+	font-size: 1.2em;
+	position: absolute;
+	text-align: left;
+	top: 0;
+	left: 0;
+}
+
+.infoLabel {
+	background: none repeat scroll 0 0 #FFF1A9;
+	border-bottom-left-radius: 3px;
+	border-bottom-right-radius: 3px;
+	font-weight: bold;
+	margin: 0 auto;
+	padding: 4px 10px;
+}
+
+.itemName {
+	font-size: 14px;
+	font-weight: bold;
+	color: Black;
+	text-align: left;
+	min-width: 400px;
+	max-width: 500px;
+}
+
+.itemManufacturer {
+	font-size: 10px;
+	font-weight: bold;
+	color: Black;
+	text-align: left;
+	min-width: 400px;
+	max-width: 500px;
+}
+
+.itemDescription {
+	font-size: 10px;
+	color: gray;
+	text-align: left;
+	max-width: 400px;
+}
+
+.contentHPanel {
+	width: 100%;
+	border-width: 0px;
+	border-left-color: #92C1F0;
+	border-left-width: 6px;
+	border-left-style: solid;
+	margin-bottom: 10px;
+	padding: 4px;
+}
+
+.focusPanelWithoutHand {
+	cursor: auto;
+	-webkit-transition: all 0.3s ease-in;
+}
+
+.focusPanelWithoutHand:focus {
+	outline: none;
+}
+
+.focusPanelWithoutHand:hover {
+	-webkit-transition: all 0.5s ease-out;
+	-moz-transition:  all 0.5s ease-out;
+	transition:  all 0.5s ease-out;
+	background-color: #D0E4F6;
+}
+
+.profile_image {
+	display: block;
+	float: left;
+	height: 30px;
+	padding: 3px 3px 0 0;
+	width: 30px;
+}
+
+.fb_button,.fb_button_rtl {
+	background:
+		url("https://s-static.ak.facebook.com/rsrc.php/v1/zL/r/FGFbc80dUKj.png")
+		no-repeat scroll 0 0 #29447E;
+	cursor: pointer;
+	display: inline-block;
+	outline: medium none;
+	padding: 0 0 0 1px;
+	text-decoration: none;
+}
+
+.fb_button .fb_button_text,.fb_button_rtl .fb_button_text {
+	background:
+		url("https://s-static.ak.facebook.com/rsrc.php/v1/zL/r/FGFbc80dUKj.png")
+		repeat scroll 0 0 #5F78AB;
+	border-bottom: 1px solid #1A356E;
+	border-top: 1px solid #879AC0;
+	color: #FFFFFF;
+	display: block;
+	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+	font-weight: bold;
+	margin: 1px 1px 0 21px;
+	padding: 2px 6px 3px;
+	text-shadow: none;
+}
+
+a.fb_button,a.fb_button_rtl,.fb_button,.fb_button_rtl {
+	text-decoration: none;
+}
+
+a.fb_button:active .fb_button_text,a.fb_button_rtl:active .fb_button_text,.fb_button:active .fb_button_text,.fb_button_rtl:active .fb_button_text
+	{
+	background: none repeat scroll 0 0 #4F6AA3;
+	border-bottom: 1px solid #29447E;
+	border-top: 1px solid #45619D;
+	text-shadow: none;
+}
+
+.fb_button_medium,.fb_button_medium_rtl {
+	background-position: left -188px;
+	font-size: 11px;
+	line-height: 14px;
+}
+
+a.fb_button_medium:active {
+	background-position: left -210px;
+}
+
+.fb_button_medium_rtl {
+	background-position: right -396px;
+}
+
+.fb_button_text_rtl,.fb_button_medium_rtl .fb_button_text {
+	margin-right: 22px;
+	padding: 2px 6px 3px;
+}
+
+a.fb_button_medium_rtl:active {
+	background-position: right -418px;
+}
+
+.fb_button_small,.fb_button_small_rtl {
+	background-position: left -232px;
+	font-size: 10px;
+	line-height: 10px;
+}
+
+.fb_button_small .fb_button_text {
+	margin-left: 17px;
+	padding: 2px 6px 3px;
+}
+
+a.fb_button_small:active,.fb_button_small:active {
+	background-position: left -250px;
+}
+
+.fb_button_small_rtl {
+	background-position: right -440px;
+}
+
+.fb_button_small_rtl .fb_button_text {
+	margin-right: 18px;
+	padding: 2px 6px;
+}
+
+a.fb_button_small_rtl:active {
+	background-position: right -458px;
+}
+
+.scroll {
+	-webkit-scrollbar-3dlight-color: #FFD700;
+	-webkit-scrollbar-arrow-color: #FFFF00;
+	-webkit-scrollbar-base-color: #FF6347;
+	-webkit-scrollbar-darkshadow-color: #FFA500;
+	-webkit-scrollbar-face-color: #008080;
+	-webkit-scrollbar-highlight-color: #FF69B4;
+	-webkit-scrollbar-shadow-color: #FF00FF;
+	
+	-moz-scrollbar-3dlight-color: #FFD700;
+	-moz-scrollbar-arrow-color: #FFFF00;
+	-moz-scrollbar-base-color: #FF6347;
+	-moz-scrollbar-darkshadow-color: #FFA500;
+	-moz-scrollbar-face-color: #008080;
+	-moz-scrollbar-highlight-color: #FF69B4;
+	-moz-scrollbar-shadow-color: #FF00FF;
+	
+	scrollbar-3dlight-color: #FFD700;
+	scrollbar-arrow-color: #FFFF00;
+	scrollbar-base-color: #FF6347;
+	scrollbar-darkshadow-color: #FFA500;
+	scrollbar-face-color: #008080;
+	scrollbar-highlight-color: #FF69B4;
+	scrollbar-shadow-color: #FF00FF;
+}
+
+.boxShadow {
+	-webkit-box-shadow: 7px 0px 7px #8B8B8B;
+	-moz-box-shadow: 7px 0px 7px #8B8B8B;
+	box-shadow: 7px 0px 7px #8B8B8B;
+	border-radius: 5px;
+	padding: 0px 0px 5px 5px;
+}
+
+.mapPanelShadow {
+	-webkit-box-shadow: 7px 7px 7px #8B8B8B;
+	-moz-box-shadow: 7px 7px 7px #8B8B8B;
+	box-shadow: 7px 7px 7px #8B8B8B;
+	padding: 15px 15px 15px 15px;
+}
+
+.scrollFlowPanel {
+	width : 220px;
+	height : 100%;
+	left : 0;
+	top : 0;
+	position : absolute;
+}
+
+.scrollPanel {
+	width : 220px;
+	height : 100%;
+}
+
+.main {
+	width : 100%;
+	height : 100%;
+}
+
+.flowPanelStyle {
+	top: 0;
+	left: 0;
+}
+
+.transformStyle {
+	-moz-transform: scale(.7);
+	-moz-transform-origin: 0pt 0pt;
+	-webkit-transform: scale(.7);
+	-webkit-transform-origin: 0pt 0pt;
+}
