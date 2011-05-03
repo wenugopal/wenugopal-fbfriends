@@ -56,12 +56,13 @@ public class FbFriends implements EntryPoint {
 	private final FBCore fbCore = GWT.create(FBCore.class);
 	private final FBEvent fbEvent =  GWT.create(FBEvent.class);
 	private FQLFriendsDetailsMap fqlFriendsDetailsMap;
-	public static Map<String, String> idLocationMap = new HashMap<String, String>();
+	public static Map<String, Location> idLocationMap = new HashMap<String, Location>();
 	private MapPanel mapPanel = null;
 	private SVGMapPanel svgMapPanel = null;
 	private Label infoLabel = null;
 	private String uid = null;
-	private TGCLocation uidLocation = null;
+	private FQLFriendsDetails currentUserDetails = null;
+	private TGCLocation userTgcLocation = null;
 	
 	public void onModuleLoad() {
 		RootPanel.get("main").addStyleName("main");
@@ -140,10 +141,22 @@ public class FbFriends implements EntryPoint {
 
 			public void onClick(ClickEvent event) {
 				RootPanel.get("friendscontent").clear();
-				updateFriendsLocationMapViaMapService();
+				getCurrentUserLocation();
 			}
 		});
 		RootPanel.get("friendsDiv").add(getLatLngButton);
+	}
+
+	protected void getCurrentUserLocation() {
+		if(this.uid != null) {
+//			currentUserDetails = fqlFriendsDetailsMap.get(this.uid);
+			currentUserDetails = fqlFriendsDetailsMap.remove(this.uid);
+			if(currentUserDetails != null && currentUserDetails.getCurrent_location() != null) {
+				getLatLngFromMapQuestForCurrentUser(currentUserDetails.getCurrent_location(), true);
+			} else {
+				updateFriendsLocationMapViaMapService();
+			}
+		}
 	}
 
 	private void initLoginButton() {
@@ -220,9 +233,8 @@ public class FbFriends implements EntryPoint {
 		Iterator<Entry<String, FQLFriendsDetails>> it = friendsDetailsList.iterator();
 		for (int i = 0; it.hasNext(); i++) {
 			Entry<String, FQLFriendsDetails> entry = it.next();
-			if (((FQLFriendsDetails) entry.getValue()).getCurrent_location() != null
-					&& ((FQLFriendsDetails) entry.getValue()).getCurrent_location().toString().trim().length() > 0) {
-				idLocationMap.put(entry.getKey(),(entry.getValue()).getCurrent_location().toString());
+			if (entry.getValue().getCurrent_location() != null && entry.getValue().getCurrent_location().toString().trim().length() > 0) {
+				idLocationMap.put(entry.getKey(), entry.getValue().getCurrent_location());
 				getLatLngFromMapQuest(entry.getValue().getCurrent_location());
 			}
 		}
@@ -260,8 +272,34 @@ public class FbFriends implements EntryPoint {
 //									location.toString(),
 //									MapUtil.getTop(MapPanel.HEIGHT,tgcLocation.getLatitude()),
 //									MapUtil.getLeft(MapPanel.WIDTH,tgcLocation.getLongitude())));
-					svgMapPanel.addPathByLatLng(17.385044, 78.486671, tgcLocation.getLatitude(), tgcLocation.getLongitude());
+					if(FbFriends.this.userTgcLocation != null) {
+						svgMapPanel.addPathByLatLng(FbFriends.this.userTgcLocation.getLatitude(), FbFriends.this.userTgcLocation.getLongitude(), tgcLocation.getLatitude(), tgcLocation.getLongitude());
+					} else {
+						svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), false);
+					}
 					
+			}
+		});
+	}
+	
+	private void getLatLngFromMapQuestForCurrentUser(final Location location, final boolean me) {
+		new MapQuestApi().send(location, new AsyncCallback<JavaScriptObject>() {
+
+			public void onFailure(Throwable caught) {
+				Window.alert("Error occured while requesting MAPQuest");
+			}
+
+			public void onSuccess(JavaScriptObject result) {
+				TGCLocation tgcLocation = MapQuestLocationDecoder.decode(result);
+				if (tgcLocation != null && svgMapPanel !=null)
+//					mapPanel.addLocationWidget(
+//							UIUtils.getLocationDiv(
+//									location.toString(),
+//									MapUtil.getTop(MapPanel.HEIGHT,tgcLocation.getLatitude()),
+//									MapUtil.getLeft(MapPanel.WIDTH,tgcLocation.getLongitude())));
+					FbFriends.this.userTgcLocation = tgcLocation;
+					svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), me);
+					updateFriendsLocationMapViaMapService();
 			}
 		});
 	}
