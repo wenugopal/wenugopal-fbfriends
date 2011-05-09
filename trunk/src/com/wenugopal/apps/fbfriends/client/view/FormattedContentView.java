@@ -25,8 +25,6 @@ public class FormattedContentView extends Composite implements Serializable {
 
 	private FlexTable contentFlexTable = null;
 
-	private FQLFriendsDetails friendsDetails = null;
-
 
 	public FormattedContentView() {
 		this.customFocusPanel = new CustomFocusPanel();
@@ -40,7 +38,6 @@ public class FormattedContentView extends Composite implements Serializable {
 
 
 	public void setData(FQLFriendsDetails friendsDetails) {
-		this.friendsDetails = friendsDetails;
 
 		FlexCellFormatter cellFormatter = contentFlexTable.getFlexCellFormatter();
 		contentFlexTable.addStyleName("contentHPanel");

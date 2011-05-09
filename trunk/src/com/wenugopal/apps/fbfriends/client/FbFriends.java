@@ -23,6 +23,7 @@ import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.wenugopal.apps.fbfriends.client.dd.FQLFriendsDetailsResponseDecoder;
 import com.wenugopal.apps.fbfriends.client.dd.MapQuestLocationDecoder;
 import com.wenugopal.apps.fbfriends.client.dd.SessionDecoder;
@@ -35,10 +36,12 @@ import com.wenugopal.apps.fbfriends.client.dto.TGCLocation;
 import com.wenugopal.apps.fbfriends.client.fb.core.FBCore;
 import com.wenugopal.apps.fbfriends.client.fb.core.FBEvent;
 import com.wenugopal.apps.fbfriends.client.fb.view.FBButton;
+import com.wenugopal.apps.fbfriends.client.fb.view.FacePile;
 import com.wenugopal.apps.fbfriends.client.geocoding.service.MapQuestApi;
 import com.wenugopal.apps.fbfriends.client.geocoding.service.TinyGeoCoderApi;
 import com.wenugopal.apps.fbfriends.client.utils.MapUtil;
 import com.wenugopal.apps.fbfriends.client.utils.UIUtils;
+import com.wenugopal.apps.fbfriends.client.view.CustomScrollPanel;
 import com.wenugopal.apps.fbfriends.client.view.FormattedContentView;
 import com.wenugopal.apps.fbfriends.client.view.FriendsScrollPanelView;
 import com.wenugopal.apps.fbfriends.client.view.MapPanel;
@@ -57,13 +60,12 @@ public class FbFriends implements EntryPoint {
 	private final FBEvent fbEvent =  GWT.create(FBEvent.class);
 	private FQLFriendsDetailsMap fqlFriendsDetailsMap;
 	public static Map<String, Location> idLocationMap = new HashMap<String, Location>();
-	private MapPanel mapPanel = null;
 	private SVGMapPanel svgMapPanel = null;
 	private Label infoLabel = null;
 	private String uid = null;
 	private FQLFriendsDetails currentUserDetails = null;
 	private TGCLocation userTgcLocation = null;
-	
+	private CustomScrollPanel customScrollPanelView = null;
 	public void onModuleLoad() {
 		RootPanel.get("main").addStyleName("main");
 		initFBCore();
@@ -82,6 +84,7 @@ public class FbFriends implements EntryPoint {
 					initGetFriendsDetailsButton();
 					initGetLatLngButton();
 					initMapArea();
+					initSrollPanel();
 				}
 				else {
 					initLoginButton();
@@ -117,6 +120,10 @@ public class FbFriends implements EntryPoint {
 				Window.alert("Error while logging out");
 			}
 		});
+	}
+
+	protected void initSrollPanel() {
+		customScrollPanelView = new CustomScrollPanel();
 	}
 
 	protected void initInfoDivArea() {
@@ -273,7 +280,7 @@ public class FbFriends implements EntryPoint {
 //									MapUtil.getTop(MapPanel.HEIGHT,tgcLocation.getLatitude()),
 //									MapUtil.getLeft(MapPanel.WIDTH,tgcLocation.getLongitude())));
 					if(FbFriends.this.userTgcLocation != null) {
-						svgMapPanel.addPathByLatLng(FbFriends.this.userTgcLocation.getLatitude(), FbFriends.this.userTgcLocation.getLongitude(), tgcLocation.getLatitude(), tgcLocation.getLongitude());
+						svgMapPanel.addPathByLatLng(FbFriends.this.userTgcLocation.getLatitude(), FbFriends.this.userTgcLocation.getLongitude(), tgcLocation.getLatitude(), tgcLocation.getLongitude(), getFacePilePopup(location.toString()));
 					} else {
 						svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), false);
 					}
@@ -282,6 +289,12 @@ public class FbFriends implements EntryPoint {
 		});
 	}
 	
+	protected Widget getFacePilePopup(String location) {
+		FacePile facePile = new FacePile();
+		facePile.setData(this.customScrollPanelView.getDetials(location));
+		return facePile;
+	}
+
 	private void getLatLngFromMapQuestForCurrentUser(final Location location, final boolean me) {
 		new MapQuestApi().send(location, new AsyncCallback<JavaScriptObject>() {
 
@@ -315,7 +328,7 @@ public class FbFriends implements EntryPoint {
 			RootPanel.get("friendscontent").clear();
 			infoLabel.setVisible(false);
 			fqlFriendsDetailsMap = FQLFriendsDetailsResponseDecoder.decode(result);
-			updateScrollPanelUI(fqlFriendsDetailsMap);
+			updateCustomScrollPanelUI(fqlFriendsDetailsMap);
 		}
 	}
 
@@ -339,6 +352,12 @@ public class FbFriends implements EntryPoint {
 		FriendsScrollPanelView friendsScrollPanelView = new FriendsScrollPanelView();
 		friendsScrollPanelView.setData(friendsDetailsList);
 		RootPanel.get("main").add(friendsScrollPanelView);
+	}
+	
+	public void updateCustomScrollPanelUI(FQLFriendsDetailsMap fqlFriendsDetailsMap) {
+		List<FQLFriendsDetails> friendsDetailsList = new ArrayList<FQLFriendsDetails>(fqlFriendsDetailsMap.values());
+		customScrollPanelView.setData(friendsDetailsList);
+		RootPanel.get().add(customScrollPanelView);
 	}
 	
 }
