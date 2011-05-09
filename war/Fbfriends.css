@@ -58,16 +58,16 @@ h1 {
 	padding: 4px;
 }
 
-.focusPanelWithoutHand {
+.customFocusPanel {
 	cursor: auto;
 	-webkit-transition: all 0.3s ease-in;
 }
 
-.focusPanelWithoutHand:focus {
+.customFocusPanel:focus {
 	outline: none;
 }
 
-.focusPanelWithoutHand:hover {
+.customFocusPanel:hover {
 	-webkit-transition: all 0.5s ease-out;
 	-moz-transition:  all 0.5s ease-out;
 	transition:  all 0.5s ease-out;
@@ -241,3 +241,215 @@ a.fb_button_small_rtl:active {
 	-webkit-transform: scale(.7);
 	-webkit-transform-origin: 0pt 0pt;
 }
+
+.customPopupPanel {
+	background-color: #000;
+	filter:alpha(opacity=.80); 
+	-moz-opacity:.80; 
+	opacity:.80;
+	overflow: visible;
+	z-index:2;
+}
+
+.clipStyle {
+	clip: rect(auto, auto, auto, auto);
+}
+	
+.customPopupPanel .popupContent {
+	z-index:3;
+	overflow: visible;
+}
+
+.customPopupBoxShadow {
+	-webkit-box-shadow: 10px 10px 10px #8B8B8B;
+	-moz-box-shadow: 10px 10px 10px #8B8B8B;
+	box-shadow: 10px 10px 10px #8B8B8B;
+	border-radius: 5px ;
+}
+
+.label-text {
+	font-size: 6pt;
+	font-weight: bold;
+	color:  white;
+	text-align: left;
+}
+
+
+.imagePanel {
+	float: left;
+	margin-left: 2px;
+	vertical-align: middle;
+}
+
+.nameLocationPanel {
+	float: left;
+	margin-left: 2px;
+	vertical-align: middle;
+}
+
+.mainPanel {
+	vertical-align: middle;
+}
+
+.namePanel {
+	display: block;
+	padding: 0px 0px 0px 0px;
+	margin:  0px 0px 0px 0px;
+	vertical-align: middle;
+}
+
+.locationPanel {
+	display: block;
+}
+
+.name {
+	display: block;
+	font-size: 10px;
+	font-weight: bold;
+	color: Black;
+	text-align: left;
+	text-decoration: none;
+	padding: 0px 0px 0px 0px;
+	margin:  0px 0px 0px 0px;
+    vertical-align: middle;
+}
+
+.sex {
+	font-size: 10px;
+	font-weight: bold;
+	color: Black;
+	text-align: left;
+	max-width: 50px;
+}
+
+.location {
+	font-size: 10px;
+	color: gray;
+	text-align: left;
+}
+
+.contentHPanel {
+	border-width: 0px;
+	border-left-color: #627AAD;
+	border-left-width: 3px;
+	border-left-style: solid;
+	border-radius: 4px;
+}
+
+.customFriendFocusPanel {
+	float: left;
+	cursor: auto;
+	max-height: 50px;
+	-webkit-transition: all 0.3s ease-in;
+	margin-left: 3px;
+	margin-right: 3px;
+	margin-bottom: 3px;
+	margin-top: 3px;
+	
+	background-color: #FFFFFF 	;
+	
+	-webkit-box-shadow: 2px 2px 3px #8B8B8B;
+	-moz-box-shadow: 2px 2px 3px #8B8B8B;
+	box-shadow: 2px 2px 3px #8B8B8B;
+	border-radius: 4px;
+	
+	border-left-color: #627AAD;
+	border-left-width: 3px;
+	border-left-style: solid;
+	vertical-align: middle;
+	
+}
+
+.customFriendFocusPanel:focus {
+	outline: none;
+	background-color: #D8DFEA;
+}
+
+.customFriendFocusPanel:hover {
+	-webkit-transition: all 0.3s ease-out;
+	-moz-transition:  all 0.3s ease-out;
+	transition:  all 0.3s ease-out;
+	background-color: #D8DFEA;
+}
+
+.customFriendFocusPanel:hover .name {
+	color: #3B5998;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.customScrollBar {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	height: 137px;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	width: 100%;
+	background-color: #F0F0F0;
+	-webkit-box-shadow: -7px 0px 7px #8B8B8B;
+	-moz-box-shadow: -7px 0px 7px #8B8B8B;
+	box-shadow: -7px 0px 7px #8B8B8B;
+	border-radius: 5px;
+}
+
+.locationListBoxPanel {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: #F0F0F0;
+	-webkit-box-shadow: -7px 0px 7px #8B8B8B;
+	-moz-box-shadow: -7px 0px 7px #8B8B8B;
+	box-shadow: -7px 0px 7px #8B8B8B;
+	border-radius: 5px;
+}
+
+.locationListBox {
+	position: absolute;
+	bottom: 137px;
+	left: 0;
+	font-size: 10px;
+	font-weight: bold;
+	color: Black;
+	text-align: left;
+	vertical-align: middle;
+	-webkit-box-shadow: 5px 0px 5px #8B8B8B;
+	-moz-box-shadow: 5px 0px 5px #8B8B8B;
+	box-shadow: 5px 0px 5px #8B8B8B;
+}
+
+.listBox {
+	font-size: 10px;
+	font-weight: bold;
+	color: Black;
+	text-align: left;
+}
+
+.filterBy {
+	font-size: 10px;
+	font-weight: bold;
+	color: Black;
+	text-align: left;
+}
+
+.uiFacePile {max-width:111px; display:-moz-inline-box;display:inline-block; vertical-align:bottom;}
+.uiFacepileItem {cursor:pointer; display:-moz-inline-box;display:inline-block;vertical-align:bottom; margin-left: 2px;}
+.uiFacepileItemImg{display:-moz-inline-box;display:inline-block; height:20px; width:20px;}
+.uiTooltip{position:relative}
+.uiTooltipActive,.uiTooltip:active,.uiTooltip:focus,.uiTooltip:hover{outline:none;text-decoration:none; z-index:999;}
+.uiTooltipWrap{display:none}
+.uiTooltipWrap:hover{visibility:hidden}
+.uiTooltipActive .uiTooltipWrap:hover{visibility:visible}
+.uiTooltipText{background-color:#282828;color:#fff !important;display:block;font-size: 10px;line-height:12px;padding:4px 8px;text-align:left;white-space:nowrap}
+.uiTooltipActive .uiTooltipWrap,.uiTooltip:active .uiTooltipWrap,.uiTooltip:focus .uiTooltipWrap,.uiTooltip:hover .uiTooltipWrap{background:url(https://s-static.ak.facebook.com/rsrc.php/v1/z1/r/uVR6w3wRHEJ.gif) left bottom no-repeat;bottom:100%;display:block;left:0;padding:0 0 4px;position:absolute}
+.uiTooltipActive .center,.uiTooltip:active .center,.uiTooltip:focus .center,.uiTooltip:hover .center{left:50%;margin-left:-10px;padding-left:10px}
+.uiTooltip .center .uiTooltipText{left:-50%;position:relative}
+.uiTooltip .centerbottom .uiTooltipText{margin-left:18px}
+.uiTooltipActive .right,.uiTooltip:active .right,.uiTooltip:focus .right,.uiTooltip:hover .right{background-position:right bottom;left:auto;right:0}
+.uiTooltipActive .middle,.uiTooltip:active .middle,.uiTooltip:focus .middle,.uiTooltip:hover .middle{background-image:url(https://s-static.ak.facebook.com/rsrc.php/v1/zR/r/kPCE0g_tKJs.gif);background-position:right top;left:auto;margin:-4px 4px 0 0;right:100%;padding:4px;top:50%}
+.uiTooltip .middle .uiTooltipText{margin-top:-10px}
+.uiTooltipActive .rightmiddle,.uiTooltip:active .rightmiddle,.uiTooltip:focus .rightmiddle,.uiTooltip:hover .rightmiddle{background-image:url(https://s-static.ak.facebook.com/rsrc.php/v1/zY/r/_ZWZupdaAgS.gif);background-position:left top;left:100%;margin:-4px 0 0 4px;right:auto}
+.uiTooltipActive .bottom,.uiTooltip:active .bottom,.uiTooltip:focus .bottom,.uiTooltip:hover .bottom{background-image:url(https://s-static.ak.facebook.com/rsrc.php/v1/zX/r/k2R_CZuPy2I.png);background-position:left top;bottom:auto;padding:4px 0 0;top:100%}
+.uiTooltipActive .rightbottom,.uiTooltip:active .rightbottom,.uiTooltip:focus .rightbottom,.uiTooltip:hover .rightbottom{background-position:right top}
+.uiTooltipDisabled:active .uiTooltipWrap,.uiTooltipDisabled:focus .uiTooltipWrap,.uiTooltipDisabled:hover .uiTooltipWrap,.openToggler > .uiTooltip:active .uiTooltipWrap,.openToggler > .uiTooltip:focus .uiTooltipWrap,.openToggler > .uiTooltip:hover .uiTooltipWrap{display:none}

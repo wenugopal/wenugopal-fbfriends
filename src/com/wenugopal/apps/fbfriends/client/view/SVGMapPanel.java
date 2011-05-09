@@ -10,6 +10,7 @@ import org.vectomatic.dom.svg.utils.SVGConstants;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.wenugopal.apps.fbfriends.client.utils.MapUtil;
 
 public class SVGMapPanel extends Composite {
@@ -59,7 +60,7 @@ public class SVGMapPanel extends Composite {
 		mapSvg.appendChild(pathElement);
 	}
 
-	public void addPathByLatLng(double lat1, double lng1, double lat2, double lng2){
+	public void addPathByLatLng(double lat1, double lng1, double lat2, double lng2, Widget widget){
 		lng1 = MapUtil.getLeft(SVGMapPanel.WIDTH, lng1);
 		lat1 = MapUtil.getTop(SVGMapPanel.HEIGHT, lat1);
 		lng2 = MapUtil.getLeft(SVGMapPanel.WIDTH, lng2);
@@ -82,14 +83,17 @@ public class SVGMapPanel extends Composite {
 		pathElement.setAttribute("d", "M"+lng1+" "+lat1+" L "+lng2+" "+lat2+"");
 		//		pathElement.setAttribute("stroke-dasharray", "10,10");
 
+
+		
+		CustomToolTip ctt = new CustomToolTip(circle2, widget);
+
 		mapSvg.appendChild(pathElement);
-		mapSvg.appendChild(circle2);
+		mapSvg.appendChild(ctt.initializePopup());
 	}
 
 	public void addCircleByLatLng(double lat2, double lng2, boolean me){
 		lng2 = MapUtil.getLeft(SVGMapPanel.WIDTH, lng2);
-		lat2 =
-			MapUtil.getTop(SVGMapPanel.HEIGHT, lat2);
+		lat2 = MapUtil.getTop(SVGMapPanel.HEIGHT, lat2);
 
 
 
@@ -103,7 +107,7 @@ public class SVGMapPanel extends Composite {
 		// Create a circle
 		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
 		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.4");
+		
 		mapSvg.appendChild(circle2);
-
 	}
 }

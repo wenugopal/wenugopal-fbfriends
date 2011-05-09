@@ -7,6 +7,6 @@ import com.google.gwt.resources.client.ClientBundle;
 
 public interface SvgMapBundle extends ClientBundle {
     public static SvgMapBundle INSTANCE = GWT.create(SvgMapBundle.class);
-    @Source("mozMap.xml")
+    @Source("svgMap.xml")
     SVGResource map();
 }
