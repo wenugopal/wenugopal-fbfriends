@@ -2,6 +2,8 @@ package com.wenugopal.apps.fbfriends.client.view;
 
 import org.vectomatic.dom.svg.OMSVGCircleElement;
 
+import com.google.gwt.event.dom.client.MouseMoveEvent;
+import com.google.gwt.event.dom.client.MouseMoveHandler;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
@@ -70,6 +72,13 @@ public class CustomToolTip {
 		}
 	}
 	
+
+	class MyPopupMouseMoveHandler implements MouseMoveHandler {
+		public void onMouseMove(MouseMoveEvent event) {
+			popup.getElement().getStyle().clearProperty("clip");
+		}
+	}
+	
 	class MyPopupMouseOutHandler implements MouseOutHandler {
 		public void onMouseOut(MouseOutEvent event) {
 			onPopupFocus = false;
@@ -119,6 +128,7 @@ public class CustomToolTip {
 		popup.setAutoHideEnabled(true);
 		popup.addMouseOverHandler(new MyPopupMouseOverHandler());
 		popup.addMouseOutHandler(new MyPopupMouseOutHandler());
+		popup.addMouseMoveHandler(new MyPopupMouseMoveHandler());
 		
 		return circle;
 	}

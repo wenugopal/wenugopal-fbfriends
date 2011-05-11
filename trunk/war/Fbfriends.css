@@ -6,6 +6,12 @@ h1 {
 	text-align: center;
 }
 
+.loginlogout {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+
 .infoDiv {
 	font-size: 1.2em;
 	position: absolute;
@@ -15,12 +21,13 @@ h1 {
 }
 
 .infoLabel {
-	background: none repeat scroll 0 0 #FFF1A9;
+	background: none repeat scroll 0 0 #627AAD;
 	border-bottom-left-radius: 3px;
 	border-bottom-right-radius: 3px;
 	font-weight: bold;
+	color: white;
 	margin: 0 auto;
-	padding: 4px 10px;
+	padding: 4px 6px;
 }
 
 .itemName {
@@ -48,15 +55,6 @@ h1 {
 	max-width: 400px;
 }
 
-.contentHPanel {
-	width: 100%;
-	border-width: 0px;
-	border-left-color: #92C1F0;
-	border-left-width: 6px;
-	border-left-style: solid;
-	margin-bottom: 10px;
-	padding: 4px;
-}
 
 .customFocusPanel {
 	cursor: auto;
@@ -258,13 +256,14 @@ a.fb_button_small_rtl:active {
 .customPopupPanel .popupContent {
 	z-index:3;
 	overflow: visible;
+	margin:  1px 1px 1px 1px;
 }
 
 .customPopupBoxShadow {
-	-webkit-box-shadow: 10px 10px 10px #8B8B8B;
-	-moz-box-shadow: 10px 10px 10px #8B8B8B;
-	box-shadow: 10px 10px 10px #8B8B8B;
-	border-radius: 5px ;
+	-webkit-box-shadow: 6px 6px 6px #8B8B8B;
+	-moz-box-shadow: 6px 6px 6px #8B8B8B;
+	box-shadow: 6px 6px 6px #8B8B8B;
+	border-radius: 3px ;
 }
 
 .label-text {
@@ -417,6 +416,22 @@ a.fb_button_small_rtl:active {
 	-webkit-box-shadow: 5px 0px 5px #8B8B8B;
 	-moz-box-shadow: 5px 0px 5px #8B8B8B;
 	box-shadow: 5px 0px 5px #8B8B8B;
+	padding-bottom: 5px;
+}
+
+.addVenu {
+	position: absolute;
+	bottom: 137px;
+	right: 0;
+	font-size: 10px;
+	text-align: right;
+	vertical-align: middle;
+	padding-bottom: 7px;
+}
+
+.marginRight {
+	margin-right: 15px;
+	vertical-align: middle;
 }
 
 .listBox {
@@ -453,3 +468,5 @@ a.fb_button_small_rtl:active {
 .uiTooltipActive .bottom,.uiTooltip:active .bottom,.uiTooltip:focus .bottom,.uiTooltip:hover .bottom{background-image:url(https://s-static.ak.facebook.com/rsrc.php/v1/zX/r/k2R_CZuPy2I.png);background-position:left top;bottom:auto;padding:4px 0 0;top:100%}
 .uiTooltipActive .rightbottom,.uiTooltip:active .rightbottom,.uiTooltip:focus .rightbottom,.uiTooltip:hover .rightbottom{background-position:right top}
 .uiTooltipDisabled:active .uiTooltipWrap,.uiTooltipDisabled:focus .uiTooltipWrap,.uiTooltipDisabled:hover .uiTooltipWrap,.openToggler > .uiTooltip:active .uiTooltipWrap,.openToggler > .uiTooltip:focus .uiTooltipWrap,.openToggler > .uiTooltip:hover .uiTooltipWrap{display:none}
+
+

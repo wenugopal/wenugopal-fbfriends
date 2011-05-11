@@ -1,16 +1,9 @@
 <!doctype html>
 <html>
-  <head>
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-
-    <link type="text/css" rel="stylesheet" href="Fbfriends.css">
-
-    <title>My World of Facebook Friends!</title>
-    
-    <script type="text/javascript" src="fbfriends/fbfriends.nocache.js"></script>
-  </head>
-
- 
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Comments on World of Facebook Friends!</title>
+</head>
 <body>
 	<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1'
 		style="position: absolute; width: 0; height: 0; border: 0"></iframe>
@@ -22,11 +15,18 @@
 	</noscript>
 	<div id="fb-root"></div>
 	<script src="http://connect.facebook.net/en_US/all.js"></script>
-	<div id='account-info'></div>
-	<div id="loginlogout" class="loginlogout"></div>
-	<div id="main" align="center">
-		<div id="friendsDiv"></div>
-		<div id="friendscontent"></div>
+	<script>
+	  FB.init({
+	    appId  : '164977740229619',
+	    status : true, // check login status
+	    cookie : true, // enable cookies to allow the server to access the session
+	    xfbml  : true  // parse XFBML
+	  });
+	</script>
+	<div style="vertical-align: middle; text-align: center;">
+		<fb:comments href='http://faceboocfriends.appspot.com' num_posts='20'
+			width='600'>
+		</fb:comments>
 	</div>
 </body>
 </html>
