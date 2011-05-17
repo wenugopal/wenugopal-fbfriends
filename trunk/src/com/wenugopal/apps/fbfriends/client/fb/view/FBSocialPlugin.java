@@ -2,11 +2,12 @@ package com.wenugopal.apps.fbfriends.client.fb.view;
 
 import com.google.gwt.user.client.ui.HTML;
 
+//TODO: consider revising code to prevent from XSS.
 public class FBSocialPlugin {
 
-	public static HTML getFacePile(String appId){
+	public static HTML getFacePile(){
 		HTML facepileHtml  = new HTML();
-		facepileHtml.setHTML("<iframe	src='http://www.facebook.com/plugins/facepile.php?app_id="+appId+"&amp;width=200&amp;max_rows=3' scrolling='no' frameborder='0' style='border:none; overflow:hidden; width:200px;' allowTransparency='true'> </iframe>");
+		facepileHtml.setHTML("<fb:facepile></fb:facepile>");
 		return facepileHtml;
 	}
 	
