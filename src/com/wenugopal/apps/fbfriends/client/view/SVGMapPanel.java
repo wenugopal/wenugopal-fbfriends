@@ -10,6 +10,9 @@ import org.vectomatic.dom.svg.ui.SVGResource;
 import org.vectomatic.dom.svg.utils.OMSVGParser;
 import org.vectomatic.dom.svg.utils.SVGConstants;
 
+import com.google.gwt.event.logical.shared.ResizeEvent;
+import com.google.gwt.event.logical.shared.ResizeHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -25,11 +28,19 @@ public class SVGMapPanel extends Composite {
 
 	public static float CIRCLE_RADIUS = 16f; 
 
+	public static int SCROLL_SPACE = 130;
+	
+	public static int MIN_HEIGHT = 30;
+	
+	public static int MIN_WIDTH = 60;
+	
 	public static String IMAGE_URL = "800px-Equirectangular-projection.jpg";
 
 	private OMSVGSVGElement mapSvg = null;
 
-	private OMSVGGElement group = null;
+	private OMSVGGElement pathsGroup = null;
+	
+	private OMSVGGElement userLocationGroup = null;
 
 	private SVGResource resource = SvgMapBundle.INSTANCE.map();
 
@@ -39,16 +50,53 @@ public class SVGMapPanel extends Composite {
 
 	public SVGMapPanel() {
 		mapSvg = resource.getSvg();
-		group  = doc.createSVGGElement();
+		pathsGroup  = doc.createSVGGElement();
+		
+		userLocationGroup = doc.createSVGGElement();
+		userLocationGroup.setAttribute("render-order", "1");
 		
 		flowPanel = new FlowPanel();
 		flowPanel.setStyleName("flowPanelStyle");
 		flowPanel.getElement().appendChild(mapSvg.getElement());
-		mapSvg.appendChild(group);
+		
+		mapSvg.appendChild(pathsGroup);
+		mapSvg.appendChild(userLocationGroup);
+		
 		initWidget(this.flowPanel);
+		Window.addResizeHandler(new MapResizeHandler());
+		
+		int mapWidth = getWidth(Window.getClientWidth(), Window.getClientHeight());
+		
+		getSvgMap().setAttribute("width", mapWidth+"px"); 
+		getSvgMap().setAttribute("height", (mapWidth/2)+"px");
+	}
+	
+	private int getWidth(int width, int height) {
+		height -= SCROLL_SPACE;
+		if(height < MIN_HEIGHT || width < MIN_WIDTH) {
+			width = MIN_WIDTH;
+		} else if(width/2 > height) {
+			width = height*2;
+		}
+		return width;
+	}
+	
+	class MapResizeHandler implements ResizeHandler {
+		public void onResize(ResizeEvent event) {
+			if(event.getWidth()> 50 && event.getHeight() > 200) {
+				int mapWidth = getWidth(Window.getClientWidth(), Window.getClientHeight());
+				getSvgMap().setAttribute("width", mapWidth+"px"); 
+				getSvgMap().setAttribute("height", (mapWidth/2)+"px");
+			}
+		}
 	}
 
 
+	public OMSVGSVGElement getSvgMap() {
+		return this.mapSvg;
+	}
+
+	
 	public void addPath(double x1, double y1, double x2, double y2){
 
 		OMSVGPathElement pathElement = doc.createSVGPathElement();
@@ -58,7 +106,7 @@ public class SVGMapPanel extends Composite {
 		pathElement.setAttribute("d", "M"+x1+" "+y1+" L "+x2+" "+y2+"");
 		pathElement.setAttribute("stroke-dasharray", "10,10");
 
-		group.appendChild(pathElement);
+		pathsGroup.appendChild(pathElement);
 	}
 
 	public void addPathByLatLng(double lat1, double lng1, double lat2, double lng2, Widget widget){
@@ -84,34 +132,37 @@ public class SVGMapPanel extends Composite {
 
 		CustomToolTip ctt = new CustomToolTip(circle2, widget);
 
-		group.appendChild(pathElement);
-		mapSvg.appendChild(ctt.initializePopup());
+		pathsGroup.appendChild(pathElement);
+		mapSvg.insertBefore(ctt.initializePopup(), userLocationGroup);
 	}
 
 	public void addCircleByLatLng(double lat2, double lng2, boolean me, Widget widget){
 		lng2 = MapUtil.getLeft(SVGMapPanel.WIDTH, lng2);
 		lat2 = MapUtil.getTop(SVGMapPanel.HEIGHT, lat2);
 
-		final OMSVGCircleElement circle2 = doc.createSVGCircleElement((float)lng2, (float)lat2, CIRCLE_RADIUS);
 		String color = "red";
+		final OMSVGCircleElement circle = doc.createSVGCircleElement((float)lng2, (float)lat2, CIRCLE_RADIUS);
+		circle.getStyle().setSVGProperty(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.4");
+		
 		if(me) {
 			color = "green";
-
+			circle.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
+			CustomToolTip ctt = new CustomToolTip(circle, widget);
+			userLocationGroup.appendChild(ctt.initializePopup());
+		} else  {
+			circle.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
+			CustomToolTip ctt = new CustomToolTip(circle, widget);
+			mapSvg.insertBefore(ctt.initializePopup(), userLocationGroup);
 		}
-		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_PROPERTY, color);
-		circle2.getStyle().setSVGProperty(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.4");
-
-		CustomToolTip ctt = new CustomToolTip(circle2, widget);
-		mapSvg.appendChild(ctt.initializePopup());
 	}
 
 	public void hidePaths() {
-		group.getStyle().clearVisibility();
-		group.getStyle().setSVGProperty("visibility", "hidden");
+		pathsGroup.getStyle().clearVisibility();
+		pathsGroup.getStyle().setSVGProperty("visibility", "hidden");
 	}
 
 	public void unHidePaths() {
-		group.getStyle().clearVisibility();
-		group.getStyle().setSVGProperty("visibility", "visible");
+		pathsGroup.getStyle().clearVisibility();
+		pathsGroup.getStyle().setSVGProperty("visibility", "visible");
 	}
 }
