@@ -50,6 +50,7 @@ import com.wenugopal.apps.fbfriends.client.utils.UIUtils;
 import com.wenugopal.apps.fbfriends.client.view.CustomScrollPanel;
 import com.wenugopal.apps.fbfriends.client.view.FormattedContentView;
 import com.wenugopal.apps.fbfriends.client.view.FriendsScrollPanelView;
+import com.wenugopal.apps.fbfriends.client.view.LoginView;
 import com.wenugopal.apps.fbfriends.client.view.MapPanel;
 import com.wenugopal.apps.fbfriends.client.view.SVGMapPanel;
 
@@ -66,11 +67,12 @@ public class FbFriends implements EntryPoint {
 	private String APP_ID = "164977740229619";
 	private String APP_URL = "http://faceboocfriends.appspot.com";
 	private String WENUGOPAL = "561226677";
+	private static String MAX_FRIENDS = "1000";
 	private final FBCore fbCore = GWT.create(FBCore.class);
 	private final FBEvent fbEvent =  GWT.create(FBEvent.class);
 	private final FBXfbml fbXfbml =  GWT.create(FBXfbml.class);
 	private FQLFriendsDetailsMap fqlFriendsDetailsMap;
-	public static Map<String, Location> idLocationMap = new HashMap<String, Location>();
+	private  Map<Location, String> locationIdMap = new HashMap<Location, String>();
 	private SVGMapPanel svgMapPanel = null;
 	private Label infoLabel = null;
 	private String uid = null;
@@ -103,6 +105,7 @@ public class FbFriends implements EntryPoint {
 				else {
 					initLoginView();
 				}
+				
 				fbXfbml.parse();
 			}
 
@@ -191,35 +194,19 @@ public class FbFriends implements EntryPoint {
 	}
 
 	private void initLoginView() {
-		Anchor loginButton = FBButton.getFBButton("Login with Facebook");
-		loginButton.addClickHandler(new ClickHandler() {
-
-			public void onClick(ClickEvent event) {
-				fbCore.login(new AsyncCallback<JavaScriptObject>() {
-
-					public void onSuccess(JavaScriptObject result) {
-						//						Window.alert("logged in");
-						Window.Location.reload();
-					}
-
-					public void onFailure(Throwable throwable) {
-					}
-				}, "user_location, friends_location");
-			}
-		});
-		RootPanel.get("main").add(loginButton);
-		RootPanel.get("main").add(FBSocialPlugin.getLikeSendHtml(APP_URL));
+		LoginView loginView = new LoginView();
+		loginView.initLoginView(fbCore);
+		RootPanel.get("main").add(loginView);
 	}
 
 	private Anchor getLogoutButton() {
-		Anchor logout = FBButton.getFBButton("Logout from Facebook");
+		Anchor logout = FBButton.getFBButton("Logout");
 		logout.addClickHandler(new ClickHandler() {
-
 			public void onClick(ClickEvent event) {
 				fbCore.logout(new AsyncCallback<JavaScriptObject>() {
 
 					public void onSuccess(JavaScriptObject result) {
-						//						Window.alert("logged out");
+//												Window.alert("logged out");
 					}
 
 					public void onFailure(Throwable caught) {
@@ -271,14 +258,14 @@ public class FbFriends implements EntryPoint {
 		RootPanel.get("friendscontent").clear();
 
 		infoLabel.setVisible(true);
-		infoLabel.setText("Getting Friends Details..");
+		infoLabel.setText("Loading Friends Details..");
 
 		configureFBquery();
 	}
 
 	private void configureFBquery() {
 		String method = "fql.query";
-		String fql = "SELECT uid, name, pic_small, pic, pic_square, sex, hometown_location, current_location, profile_url, username FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me())  Limit 500";
+		String fql = "SELECT uid, name, pic_small, pic, pic_square, sex, hometown_location, current_location, profile_url, username FROM user WHERE uid = me() OR uid IN (SELECT uid2 FROM friend WHERE uid1 = me())  Limit "+MAX_FRIENDS;
 		JSONObject query = new JSONObject();
 		query.put("method", new JSONString(method));
 		query.put("query", new JSONString(fql));
@@ -291,10 +278,65 @@ public class FbFriends implements EntryPoint {
 		Iterator<Entry<String, FQLFriendsDetails>> it = friendsDetailsList.iterator();
 		for (int i = 0; it.hasNext(); i++) {
 			Entry<String, FQLFriendsDetails> entry = it.next();
+			
+			// Store location and corresponding user ids to optimize the number of requests sent to location service.
 			if (entry.getValue().getCurrent_location() != null && entry.getValue().getCurrent_location().toString().trim().length() > 0) {
-				idLocationMap.put(entry.getKey(), entry.getValue().getCurrent_location());
-				getLatLngFromMapQuest(entry.getValue().getCurrent_location());
+				if(locationIdMap.containsKey(entry.getValue().getCurrent_location())) {
+					String idString = locationIdMap.get(entry.getValue().getCurrent_location());
+					idString = idString+entry.getKey()+",";
+					locationIdMap.put(entry.getValue().getCurrent_location(), idString);
+				} else {
+					locationIdMap.put(entry.getValue().getCurrent_location(), entry.getKey()+",");
+				}
 			}
+		}
+		
+		getLatLngFromMapQuest();
+	}
+
+	private void getLatLngFromMapQuest() {
+		Set<Entry<Location, String>> locationIds = locationIdMap.entrySet();
+		Iterator<Entry<Location, String>> it = locationIds.iterator();
+		for (int i = 0; it.hasNext(); i++) {
+			Entry<Location, String> entry = it.next();
+			getLatLngFromMapQuest(entry.getKey()); 
+		}
+	}
+	
+	
+	private void getLatLngFromMapQuest(final Location location) {
+		new MapQuestApi().send(location, new AsyncCallback<JavaScriptObject>() {
+
+			public void onFailure(Throwable caught) {
+				Window.alert("Error occured while requesting MAPQuest");
+			}
+			
+			public void onSuccess(JavaScriptObject result) {
+				TGCLocation tgcLocation = MapQuestLocationDecoder.decode(result);
+				updateLocationUi(tgcLocation, location);
+			}
+		});
+	}
+
+	
+	
+
+	protected void updateLocationUi(TGCLocation tgcLocation, Location location) {
+		String idsString = locationIdMap.get(location);
+		String ids[] = idsString.split(",");
+		for(String id : ids) {
+			if (id != null && id.trim().length() > 0 && tgcLocation != null && svgMapPanel !=null)
+				if(FbFriends.this.userTgcLocation != null) {
+					if(FbFriends.this.currentUserDetails != null) {
+						if(FbFriends.this.currentUserDetails.getCurrent_location().toString().equalsIgnoreCase(location.toString())) {
+							svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), true, getFacePilePopup(location.toString()));
+						} else {
+							svgMapPanel.addPathByLatLng(FbFriends.this.userTgcLocation.getLatitude(), FbFriends.this.userTgcLocation.getLongitude(), tgcLocation.getLatitude(), tgcLocation.getLongitude(), getFacePilePopup(location.toString()));
+						}
+					}
+				} else {
+					svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), false, getFacePilePopup(location.toString()));
+				}
 		}
 	}
 
@@ -315,37 +357,7 @@ public class FbFriends implements EntryPoint {
 		});
 	}
 
-	private void getLatLngFromMapQuest(final Location location) {
-		new MapQuestApi().send(location, new AsyncCallback<JavaScriptObject>() {
-
-			public void onFailure(Throwable caught) {
-				Window.alert("Error occured while requesting MAPQuest");
-			}
-
-			public void onSuccess(JavaScriptObject result) {
-				TGCLocation tgcLocation = MapQuestLocationDecoder.decode(result);
-				if (tgcLocation != null && svgMapPanel !=null)
-					//					mapPanel.addLocationWidget(
-					//							UIUtils.getLocationDiv(
-					//									location.toString(),
-					//									MapUtil.getTop(MapPanel.HEIGHT,tgcLocation.getLatitude()),
-					//									MapUtil.getLeft(MapPanel.WIDTH,tgcLocation.getLongitude())));
-					if(FbFriends.this.userTgcLocation != null) {
-						if(FbFriends.this.currentUserDetails != null) {
-							if(FbFriends.this.currentUserDetails.getCurrent_location().toString().equalsIgnoreCase(location.toString())) {
-								svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), true, getFacePilePopup(location.toString()));
-							} else {
-								svgMapPanel.addPathByLatLng(FbFriends.this.userTgcLocation.getLatitude(), FbFriends.this.userTgcLocation.getLongitude(), tgcLocation.getLatitude(), tgcLocation.getLongitude(), getFacePilePopup(location.toString()));
-							}
-						}
-					} else {
-						svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), false, getFacePilePopup(location.toString()));
-					}
-
-			}
-		});
-	}
-
+	
 	protected Widget getFacePilePopup(String location) {
 		FacePile facePile = new FacePile();
 		facePile.setData(this.customScrollPanelView.getDetials(location));
@@ -362,11 +374,6 @@ public class FbFriends implements EntryPoint {
 			public void onSuccess(JavaScriptObject result) {
 				TGCLocation tgcLocation = MapQuestLocationDecoder.decode(result);
 				if (tgcLocation != null && svgMapPanel !=null)
-					//					mapPanel.addLocationWidget(
-					//							UIUtils.getLocationDiv(
-					//									location.toString(),
-					//									MapUtil.getTop(MapPanel.HEIGHT,tgcLocation.getLatitude()),
-					//									MapUtil.getLeft(MapPanel.WIDTH,tgcLocation.getLongitude())));
 					FbFriends.this.userTgcLocation = tgcLocation;
 				svgMapPanel.addCircleByLatLng(tgcLocation.getLatitude(), tgcLocation.getLongitude(), me, getFacePilePopup(location.toString()));
 				updateFriendsLocationMapViaMapService();
@@ -393,7 +400,7 @@ public class FbFriends implements EntryPoint {
 			getLocations();
 		}
 	}
-	
+
 	class IsFriendsFBQueryCallback implements AsyncCallback<JavaScriptObject> {
 		public void onFailure(Throwable caught) {
 			Window.alert("Error occured while executing FBQueryCallback");
@@ -423,11 +430,10 @@ public class FbFriends implements EntryPoint {
 	}
 
 	public void updateAddVenuUi() {
-		//TODO: Add ui to add venu as friend to user who is not already friend with venu.
 		Anchor addVenuLabel = new Anchor("Add Venu as Friend");
 		addVenuLabel.addStyleName("addVenu");
 		addVenuLabel.addClickHandler(new ClickHandler() {
-			
+
 			@Override
 			public void onClick(ClickEvent event) {
 				Window.open("http://www.facebook.com/wenugopal", "_blank", null);
@@ -435,7 +441,7 @@ public class FbFriends implements EntryPoint {
 		});
 		RootPanel.get().add(addVenuLabel);
 	}
-	
+
 	public void addCommentsDocsLinks() {
 		Anchor commentsAnchor = new Anchor("Comment");
 		commentsAnchor.addStyleName("marginRight");
@@ -446,13 +452,13 @@ public class FbFriends implements EntryPoint {
 			}
 		});
 		likeLogoutPanel.add(commentsAnchor);
-		
-		Anchor docssAnchor = new Anchor("Docs");
+
+		Anchor docssAnchor = new Anchor("About");
 		docssAnchor.addStyleName("marginRight");
 		docssAnchor.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Window.open(GWT.getHostPageBaseURL()+"documentation.html", "_blank", null);
+				Window.open(GWT.getHostPageBaseURL()+"about.html", "_blank", null);
 			}
 		});
 		likeLogoutPanel.add(docssAnchor);
