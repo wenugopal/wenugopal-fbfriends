@@ -38,6 +38,7 @@ public class CustomToolTip {
 		this.widget = widget;
 		this.circle.addMouseOverHandler(new MouseTrackerMouseOverHandler());
 		this.circle.addMouseOutHandler(new MouseTrackerMouseOutHandler());
+		this.circle.addMouseMoveHandler(new MouseTrackerMouseMoveHandler());
 	}
 	
 	class MouseTrackerMouseOverHandler implements MouseOverHandler {
@@ -52,6 +53,13 @@ public class CustomToolTip {
 //			System.out.println("event.getScreenX(): "+event.getScreenX());
 //			System.out.println("event.getScreenY(): "+event.getScreenY());
 			new PopupShowTimer().schedule(CustomToolTip.POPUP_MOUSEOVER_TIMEOUT);
+		}
+	}
+	class MouseTrackerMouseMoveHandler implements MouseMoveHandler {
+		public void onMouseMove(MouseMoveEvent event) {
+			onFocus = true;
+			X = event.getClientX();
+			Y = event.getClientY();
 		}
 	}
 	
@@ -100,7 +108,7 @@ public class CustomToolTip {
 		public void run() {
 			if((onFocus || onPopupFocus) && !popup.isShowing()) {
 				if(X != null && Y != null) {
-					popup.setPopupPosition(X, Y - 10);
+					popup.setPopupPosition(X + 3, Y);
 					popup.show();
 				}
 			}

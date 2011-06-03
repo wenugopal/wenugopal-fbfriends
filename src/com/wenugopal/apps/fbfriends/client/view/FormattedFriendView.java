@@ -30,6 +30,8 @@ public class FormattedFriendView extends Composite implements Serializable {
 	private FlowPanel nameLocationPanel = null;
 	private FlowPanel namePanel = null;
 	private FlowPanel locationPanel = null;
+	
+	private boolean isFiltered = true;
 
 	private FQLFriendsDetails fqlFriendsDetails = null;
 
@@ -106,5 +108,21 @@ public class FormattedFriendView extends Composite implements Serializable {
 	
 	public FQLFriendsDetails getDetails() {
 		return this.fqlFriendsDetails;
+	}
+
+
+	/**
+	 * @return the isFiltered
+	 */
+	public boolean isFiltered() {
+		return isFiltered;
+	}
+
+
+	/**
+	 * @param isFiltered the isFiltered to set
+	 */
+	public void setFiltered(boolean isFiltered) {
+		this.isFiltered = isFiltered;
 	}
 }

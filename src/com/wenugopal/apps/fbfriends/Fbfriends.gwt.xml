@@ -5,8 +5,8 @@
 	<inherits name="com.google.gwt.json.JSON" />
 	<inherits name='com.google.gwt.jsonp.Jsonp' />
 	<inherits name='org.vectomatic.libgwtsvg'/>
-
-	<inherits name='com.google.gwt.user.theme.standard.Standard' />
+	<inherits name='com.google.gwt.visualization.Visualization'/>
+	<inherits name='com.google.gwt.user.theme.clean.Clean'/>
 
 	<entry-point class='com.wenugopal.apps.fbfriends.client.FbFriends' />
 

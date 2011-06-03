@@ -9,11 +9,14 @@ import java.util.Set;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.wenugopal.apps.fbfriends.client.dto.FQLFriendsDetails;
@@ -21,11 +24,15 @@ import com.wenugopal.apps.fbfriends.client.dto.FQLFriendsDetails;
 public class CustomScrollPanel extends Composite {
 
 	private FlowPanel horizontalFlowPanel = null;
-	private FlowPanel locationPanel = null;
+	private FlowPanel customScrollPanel = null;
 	private HorizontalPanel locationOptionsPanel = null;
+
+	private HorizontalPanel searchPanel = null;
+	private TextBox searchTextBox = null;
 
 	private ListBox listBox = null;
 	private ListBox options = null;
+
 
 	private Set<String> locations = null;
 	private Set<String> countries = null;
@@ -33,17 +40,23 @@ public class CustomScrollPanel extends Composite {
 	private List<String> locationsSortedList = null;
 	private List<String> countriesSortedList = null;
 
+
 	private Label noOfFriendsValue = null;
 
 	public CustomScrollPanel(){
-		locationPanel = new FlowPanel();
+		customScrollPanel = new FlowPanel();
 		horizontalFlowPanel = new FlowPanel();
 		noOfFriendsValue = new Label();
 
+		customScrollPanel.setWidth("100%");
+
 		initializeLocationOptions();
-		locationPanel.add(locationOptionsPanel);
-		locationPanel.add(horizontalFlowPanel);
-		initWidget(locationPanel);
+		customScrollPanel.add(locationOptionsPanel);
+		customScrollPanel.add(searchPanel);
+		customScrollPanel.add(horizontalFlowPanel);
+
+
+		initWidget(customScrollPanel);
 	}
 
 	private void initializeLocationOptions() {
@@ -52,7 +65,7 @@ public class CustomScrollPanel extends Composite {
 
 		noOfFriends.setStyleName("noOfFriends");
 		noOfFriendsValue.setStyleName("noOfFriendsValue");
-		
+
 		filterBy.setStyleName("filterBy");
 		locationOptionsPanel = new HorizontalPanel();
 		locationOptionsPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
@@ -67,15 +80,15 @@ public class CustomScrollPanel extends Composite {
 		options.addStyleName("listBox");
 
 		horizontalFlowPanel.setStyleName("customScrollBar");
-		locationPanel.setStyleName("locationListBoxPanel");
+		customScrollPanel.setStyleName("locationListBoxPanel");
 		locationOptionsPanel.addStyleName("locationListBox");
 
 		locations = new HashSet<String>();
 		countries = new HashSet<String>();
-
+		
 		locationsSortedList = new ArrayList<String>();
 		countriesSortedList = new ArrayList<String>();
-		
+
 		locationOptionsPanel.add(filterBy);
 		locationOptionsPanel.add(options);
 		locationOptionsPanel.add(listBox);
@@ -85,6 +98,7 @@ public class CustomScrollPanel extends Composite {
 		listBox.addChangeHandler(new ChangeHandler() {
 			@Override
 			public void onChange(ChangeEvent event) {
+				searchTextBox.setValue("");
 				int selectedIndex = listBox.getSelectedIndex();
 				if (selectedIndex >= 0) {
 					if(listBox.getValue(selectedIndex).equalsIgnoreCase("All")) {
@@ -115,8 +129,37 @@ public class CustomScrollPanel extends Composite {
 			}
 		});
 
+		initSearchPanel();
 	}
 
+
+	private void initSearchPanel() {
+		searchPanel = new HorizontalPanel();
+		searchPanel.addStyleName("searchPanel");
+
+		searchTextBox = new TextBox();
+		searchTextBox.setStyleName("searchTextBox");
+		Label searchText = new Label("Search : ");
+		searchText.setStyleName("searchText");
+		searchPanel.setVerticalAlignment(VerticalPanel.ALIGN_MIDDLE);
+
+		searchPanel.add(searchText);
+		searchPanel.add(searchTextBox);
+		searchTextBox.addKeyUpHandler(new KeyUpHandler() {
+			@Override
+			public void onKeyUp(KeyUpEvent event) {
+				String input = searchTextBox.getValue();
+				if(input != null) {
+					if(input.length() == 0) {
+						showFilteredFriends();
+					}else {
+						filterFriendsByName(input);
+					}
+
+				}
+			}
+		});
+	}
 
 	public void updateListBox(Collection<String> options) {
 		listBox.clear();
@@ -151,7 +194,6 @@ public class CustomScrollPanel extends Composite {
 
 			horizontalFlowPanel.add(new FormattedFriendView().setData(detail));
 		}
-
 		
 		// add options to an array and sort the list box options.
 		locationsSortedList.addAll(locations);
@@ -176,9 +218,11 @@ public class CustomScrollPanel extends Composite {
 					if(friendView.getDetails() != null) {
 						if(friendView.getDetails().getCurrent_location() != null &&  friendView.getDetails().getCurrent_location().toString().contains(location)){
 							widget.setVisible(true);
+							friendView.setFiltered(true);
 							size++;
 						} else {
 							widget.setVisible(false);
+							friendView.setFiltered(false);
 						}
 					}
 				}
@@ -198,12 +242,15 @@ public class CustomScrollPanel extends Composite {
 					FormattedFriendView friendView = (FormattedFriendView)widget;
 					if(isAll) {
 						widget.setVisible(true);
+						friendView.setFiltered(true);
 						size++;
 					} else if (friendView.getDetails() != null && friendView.getDetails().getCurrent_location() == null) {
 						widget.setVisible(true);
+						friendView.setFiltered(true);
 						size++;
 					} else {
 						widget.setVisible(false);
+						friendView.setFiltered(false);
 					}
 				}
 			}
@@ -231,4 +278,43 @@ public class CustomScrollPanel extends Composite {
 		}
 		return detailsList;
 	}
+
+
+	public void filterFriendsByName(String input) {
+		if(this.horizontalFlowPanel != null) {
+			int count = this.horizontalFlowPanel.getWidgetCount();
+			for (int i = 0; i < count; i++) {
+				Widget widget = horizontalFlowPanel.getWidget(i);
+				if(widget instanceof FormattedFriendView) {
+					FormattedFriendView friendView = (FormattedFriendView)widget;
+					if(friendView.getDetails() != null && friendView.isFiltered() ) {
+						if(friendView.getDetails().getName() != null &&  friendView.getDetails().getName().toLowerCase().contains(input.toLowerCase())){
+							widget.setVisible(true);
+						} else {
+							widget.setVisible(false);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	public void showFilteredFriends() {
+		if(this.horizontalFlowPanel != null) {
+			int count = this.horizontalFlowPanel.getWidgetCount();
+			for (int i = 0; i < count; i++) {
+				Widget widget = horizontalFlowPanel.getWidget(i);
+				if(widget instanceof FormattedFriendView) {
+					FormattedFriendView friendView = (FormattedFriendView)widget;
+					if(friendView.getDetails() != null && friendView.isFiltered() ) {
+						widget.setVisible(true);
+					} else {
+						widget.setVisible(false);
+					}
+				}
+			}
+		}
+	}
+
+
 }

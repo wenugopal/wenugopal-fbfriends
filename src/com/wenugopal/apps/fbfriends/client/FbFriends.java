@@ -8,9 +8,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.vectomatic.dom.svg.OMSVGPoint;
+
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Style.Position;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -21,12 +24,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.FlexTable;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.visualization.client.VisualizationUtils;
+import com.google.gwt.visualization.client.visualizations.BarChart;
 import com.wenugopal.apps.fbfriends.client.dd.FQLFriendsDetailsResponseDecoder;
 import com.wenugopal.apps.fbfriends.client.dd.IsFriendsDecoder;
 import com.wenugopal.apps.fbfriends.client.dd.MapQuestLocationDecoder;
@@ -37,6 +44,7 @@ import com.wenugopal.apps.fbfriends.client.dto.FQLFriendsDetailsMap;
 import com.wenugopal.apps.fbfriends.client.dto.Location;
 import com.wenugopal.apps.fbfriends.client.dto.SessionStatus;
 import com.wenugopal.apps.fbfriends.client.dto.TGCLocation;
+import com.wenugopal.apps.fbfriends.client.factory.ImageFactory;
 import com.wenugopal.apps.fbfriends.client.fb.core.FBCore;
 import com.wenugopal.apps.fbfriends.client.fb.core.FBEvent;
 import com.wenugopal.apps.fbfriends.client.fb.core.FBXfbml;
@@ -53,6 +61,7 @@ import com.wenugopal.apps.fbfriends.client.view.FriendsScrollPanelView;
 import com.wenugopal.apps.fbfriends.client.view.LoginView;
 import com.wenugopal.apps.fbfriends.client.view.MapPanel;
 import com.wenugopal.apps.fbfriends.client.view.SVGMapPanel;
+import com.wenugopal.apps.fbfriends.client.view.StatsView;
 
 
 /**
@@ -65,7 +74,6 @@ import com.wenugopal.apps.fbfriends.client.view.SVGMapPanel;
 public class FbFriends implements EntryPoint {
 
 	private String APP_ID = "164977740229619";
-	private String APP_URL = "http://faceboocfriends.appspot.com";
 	private String WENUGOPAL = "561226677";
 	private static String MAX_FRIENDS = "1000";
 	private final FBCore fbCore = GWT.create(FBCore.class);
@@ -81,10 +89,13 @@ public class FbFriends implements EntryPoint {
 	private CustomScrollPanel customScrollPanelView = null;
 	private CheckBox pathBox = null;
 	HorizontalPanel likeLogoutPanel = null;
-
+	private Anchor statsAnchor = new Anchor("Stats");
+	
 	public void onModuleLoad() {
 		RootPanel.get("main").addStyleName("main");
 		initFBCore();
+		RootPanel.getBodyElement().getStyle().setMargin(0, Unit.PX);
+		RootPanel.getBodyElement().getStyle().setPadding(0, Unit.PX);
 	}
 
 	private void initFBCore() {
@@ -184,7 +195,7 @@ public class FbFriends implements EntryPoint {
 	protected void getCurrentUserLocation() {
 		if(this.uid != null) {
 			//			currentUserDetails = fqlFriendsDetailsMap.get(this.uid);
-			currentUserDetails = fqlFriendsDetailsMap.remove(this.uid);
+			currentUserDetails = fqlFriendsDetailsMap.get(this.uid);
 			if(currentUserDetails != null && currentUserDetails.getCurrent_location() != null) {
 				getLatLngFromMapQuestForCurrentUser(currentUserDetails.getCurrent_location(), true);
 			} else {
@@ -234,14 +245,50 @@ public class FbFriends implements EntryPoint {
 				}
 			}
 		});
-
+		addZoomOptions();
 		likeLogoutPanel.add(pathBox);
 		addCommentsDocsLinks();
-		likeLogoutPanel.add(FBSocialPlugin.getLikeSendHtml(APP_URL));
+		likeLogoutPanel.add(FBSocialPlugin.getLikeSendHtml(GWT.getHostPageBaseURL()));
 		//		likeLogoutPanel.add(getLogoutButton());
 		RootPanel.get("loginlogout").add(likeLogoutPanel);
 	}
 
+
+	private void addZoomOptions() {
+		Image zoomIn = new Image("Zoom_In.png");
+		Image zoomOut = new Image("Zoom_Out.png");
+		zoomIn.addStyleName("cursorHand");
+		zoomOut.addStyleName("cursorHand");
+		zoomIn.getElement().getStyle().setMarginRight(8, Unit.PX);
+		zoomOut.getElement().getStyle().setMarginRight(20, Unit.PX);
+		zoomIn.setSize("20px", "20px");
+		zoomOut.setSize("20px", "20px");
+		
+		zoomIn.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				svgMapPanel.scale(4, getMidPoint());
+			}
+		});
+		
+		zoomOut.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				svgMapPanel.scale(-4, getMidPoint());
+			}
+		});
+		
+		likeLogoutPanel.add(zoomIn);
+		likeLogoutPanel.add(zoomOut);
+		
+	}
+	
+	private OMSVGPoint getMidPoint() {
+		OMSVGPoint point = svgMapPanel.getSvgMap().createSVGPoint();
+		point.setX(Window.getClientWidth()/2);
+		point.setY(Window.getClientHeight()/2);
+		return point;
+	}
 
 	private void initGetFriendsDetailsButton() {
 		Button queryButton = new Button("Get Friends Details");
@@ -281,6 +328,7 @@ public class FbFriends implements EntryPoint {
 			
 			// Store location and corresponding user ids to optimize the number of requests sent to location service.
 			if (entry.getValue().getCurrent_location() != null && entry.getValue().getCurrent_location().toString().trim().length() > 0) {
+				updateCountryIdMap(entry);
 				if(locationIdMap.containsKey(entry.getValue().getCurrent_location())) {
 					String idString = locationIdMap.get(entry.getValue().getCurrent_location());
 					idString = idString+entry.getKey()+",";
@@ -290,10 +338,26 @@ public class FbFriends implements EntryPoint {
 				}
 			}
 		}
-		
+		enableStats();
 		getLatLngFromMapQuest();
 	}
 
+	private void enableStats() {
+		statsAnchor.setEnabled(true);
+	}
+
+	private void updateCountryIdMap (Entry<String, FQLFriendsDetails> entry) {
+		if (entry.getValue().getCurrent_location() != null && entry.getValue().getCurrent_location().getCountry()!= null && entry.getValue().getCurrent_location().toString().trim().length() > 0) {
+			if(countryIdMap.containsKey(entry.getValue().getCurrent_location().getCountry())) {
+				String idString = countryIdMap.get(entry.getValue().getCurrent_location().getCountry());
+				idString = idString+entry.getKey()+",";
+				countryIdMap.put(entry.getValue().getCurrent_location().getCountry(), idString);
+			} else {
+				countryIdMap.put(entry.getValue().getCurrent_location().getCountry(), entry.getKey()+",");
+			}
+		}
+	}
+	
 	private void getLatLngFromMapQuest() {
 		Set<Entry<Location, String>> locationIds = locationIdMap.entrySet();
 		Iterator<Entry<Location, String>> it = locationIds.iterator();
@@ -308,7 +372,7 @@ public class FbFriends implements EntryPoint {
 		new MapQuestApi().send(location, new AsyncCallback<JavaScriptObject>() {
 
 			public void onFailure(Throwable caught) {
-				Window.alert("Error occured while requesting MAPQuest");
+//				Window.alert("Error occured while requesting MAPQuest");
 			}
 			
 			public void onSuccess(JavaScriptObject result) {
@@ -436,15 +500,22 @@ public class FbFriends implements EntryPoint {
 
 			@Override
 			public void onClick(ClickEvent event) {
-				Window.open("http://www.facebook.com/wenugopal", "_blank", null);
+				Window.open("https://www.facebook.com/wenugopal", "_blank", null);
 			}
 		});
 		RootPanel.get().add(addVenuLabel);
 	}
 
 	public void addCommentsDocsLinks() {
+		initStats();
+		statsAnchor.setEnabled(false);
+		statsAnchor.addStyleName("marginRight");
+		statsAnchor.addStyleName("anchorStyle");
+		likeLogoutPanel.add(statsAnchor);
+
 		Anchor commentsAnchor = new Anchor("Comment");
 		commentsAnchor.addStyleName("marginRight");
+		commentsAnchor.addStyleName("anchorStyle");
 		commentsAnchor.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -455,6 +526,7 @@ public class FbFriends implements EntryPoint {
 
 		Anchor docssAnchor = new Anchor("About");
 		docssAnchor.addStyleName("marginRight");
+		docssAnchor.addStyleName("anchorStyle");
 		docssAnchor.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -484,6 +556,64 @@ public class FbFriends implements EntryPoint {
 		List<FQLFriendsDetails> friendsDetailsList = new ArrayList<FQLFriendsDetails>(fqlFriendsDetailsMap.values());
 		customScrollPanelView.setData(friendsDetailsList);
 		RootPanel.get().add(customScrollPanelView);
+	}
+
+	private DialogBox box = new DialogBox();
+	private FlowPanel panel = new FlowPanel();
+	private StatsView statsView = null;
+	private Label label = new Label("Loading...");
+	private HorizontalPanel loadingPanel = null;
+	private final Button close = new Button("Close Stats");
+	private  Map<String, String> countryIdMap = new HashMap<String, String>();
+	
+	private void initStats(){
+		box.setWidget(panel);
+		label.getElement().getStyle().setMarginLeft(10, Unit.PX);
+		loadingPanel = new HorizontalPanel();
+		Image loadingImg = ImageFactory.createCustomUrlImage("loader.gif", "15px", "15px");
+		loadingPanel.add(loadingImg);
+		loadingPanel.add(label);
+		
+//		box.setWidth("951px");
+//		box.setHeight((locationIdMap.size()*40)+"px");
+		box.setGlassEnabled(true);
+		box.center();
+		box.getElement().getStyle().setTop(20, Unit.PX);
+		box.hide();
+
+//		panel.addStyleName("");
+		statsAnchor.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				box.center();
+				panel.clear();
+				close.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						box.hide();
+					}
+				});
+				close.getElement().getStyle().setPosition(Position.RELATIVE);
+				close.setVisible(false);
+				panel.add(loadingPanel);
+				panel.add(close);
+				loadPieChart();
+			}
+		});
+	}
+
+	private void loadPieChart(){
+		loadingPanel.setVisible(true);
+		close.setVisible(false);
+		VisualizationUtils.loadVisualizationApi(new Runnable() {
+			public void run() {
+				panel.add(new StatsView().setData(fqlFriendsDetailsMap, countryIdMap));
+				loadingPanel.setVisible(false);
+				box.getElement().getStyle().setLeft((Window.getClientWidth() > 950 ? (Window.getClientWidth() - 950)/2 : 0), Unit.PX);
+				close.getElement().getStyle().setLeft(390, Unit.PX);
+				close.setVisible(true);
+				box.getElement().getStyle().setTop(20, Unit.PX);
+			}}, BarChart.PACKAGE);
 	}
 
 }
